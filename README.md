@@ -2,7 +2,7 @@
 
 基于Handler的Android定时器与倒计时器
 
-[Github AndroidTimer]( https://github.com/xesam/AndroidTimer)
+源码地址：[Github AndroidTimer]( https://github.com/xesam/AndroidTimer)
 
 修改自 Android SDK 中的 [CountDownTimer](http://developer.android.com/reference/android/os/CountDownTimer.html)
 
