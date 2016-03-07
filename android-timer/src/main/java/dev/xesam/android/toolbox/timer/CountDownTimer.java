@@ -5,9 +5,9 @@ import android.os.Message;
 import android.os.SystemClock;
 
 /**
+ * 倒计时器
+ * <p/>
  * xesamguo@gmail.com
- *
- * CountDownTimer
  */
 public class CountDownTimer {
 
