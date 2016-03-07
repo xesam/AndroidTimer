@@ -6,7 +6,7 @@ import android.os.SystemClock;
 
 /**
  * 计时器
- * <p/>
+ * <p>
  * xesamguo@gmail.com
  */
 public class CountTimer {
@@ -38,6 +38,8 @@ public class CountTimer {
         mCancelled = false;
         mRunning = true;
         mTotalPausedFly = 0;
+        onStart(0);
+        
         mMillisStart = SystemClock.elapsedRealtime();
         mHandler.sendMessage(mHandler.obtainMessage(MSG));
         return this;
@@ -52,8 +54,8 @@ public class CountTimer {
         }
         mRunning = false;
 
-        mMillisPause = SystemClock.elapsedRealtime();
         mHandler.removeMessages(MSG);
+        mMillisPause = SystemClock.elapsedRealtime();
         onPause(mMillisPause - mMillisStart - mTotalPausedFly);
     }
 
@@ -66,14 +68,11 @@ public class CountTimer {
         }
         mRunning = true;
 
+        onResume(mMillisPause - mMillisStart - mTotalPausedFly);
+
         long delay = mCountInterval - (mMillisPause - mMillisLastTickStart);
-        while (delay < 0) {
-            delay += mCountInterval;
-        }
-        final long tmpPausedFly = mTotalPausedFly;
         mTotalPausedFly += SystemClock.elapsedRealtime() - mMillisPause;
         mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), delay);
-        onResume(mMillisPause - mMillisStart - tmpPausedFly);
     }
 
     /**
@@ -96,6 +95,9 @@ public class CountTimer {
         mMillisStart = NOT_START;
     }
 
+    public void onStart(long millisFly) {
+    }
+
     public void onCancel(long millisFly) {
     }
 
@@ -108,7 +110,7 @@ public class CountTimer {
     public void onTick(long millisFly) {
     }
 
-    public boolean isRunning() {
+    public final boolean isRunning() {
         return mRunning;
     }
 

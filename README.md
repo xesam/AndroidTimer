@@ -1,10 +1,10 @@
-#android-timer
+# android-timer
 
 基于Handler的Android定时器与倒计时器
 
 修改自 [CountDownTimer](http://developer.android.com/reference/android/os/CountDownTimer.html)
 
-##特性
+## 特性
 
 支持操作 :
 
@@ -13,9 +13,12 @@
 1. resume
 1. cancel
 
-##使用
+### 注意
+*以上方法是同步方法，请不要在回调方法里面调用以上方法。*
 
-###CountTimer
+## 使用
+
+### CountTimer
 
     new CountTimer(100) {
 
@@ -26,7 +29,7 @@
         }
     };
 
-###CountDownTimer
+### CountDownTimer
 
     new CountDownTimer(100) {
 
@@ -52,6 +55,6 @@
         }
     };
 
-##截图
+## 截图
 
 ![timer](./timer.png)

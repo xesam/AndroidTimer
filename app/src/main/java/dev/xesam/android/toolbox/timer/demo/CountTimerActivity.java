@@ -16,7 +16,7 @@ import dev.xesam.android.toolbox.timer.CountTimer;
 
 /**
  * xesamguo@gmail.com
- * */
+ */
 public class CountTimerActivity extends AppCompatActivity {
 
     @InjectView(R.id.count_timer_ts)
@@ -46,6 +46,11 @@ public class CountTimerActivity extends AppCompatActivity {
 
         countTimer = new CountTimer(100) {
             @Override
+            public void onStart(long millisFly) {
+                vCountStatus.setText((millisFly) + ":start");
+            }
+
+            @Override
             public void onCancel(long millisFly) {
                 vCountStatus.setText((millisFly) + ":onCancel");
             }
@@ -62,12 +67,17 @@ public class CountTimerActivity extends AppCompatActivity {
 
             @Override
             public void onTick(long millisFly) {
-                vCountSwitcher.setText((millisFly) + "");
+                vCountSwitcher.setText((millisFly) + ":onTick");
                 Log.d("onTick", millisFly + "");
             }
         };
 
         countDownTimer = new CountDownTimer(10000, 100) {
+            @Override
+            public void onStart(long millisUntilFinished) {
+                vCountDownStatus.setText((millisUntilFinished) + ":start");
+            }
+
             @Override
             public void onCancel(long millisUntilFinished) {
                 vCountDownStatus.setText((millisUntilFinished) + ":onCancel");
@@ -85,7 +95,7 @@ public class CountTimerActivity extends AppCompatActivity {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                vCountDownSwitcher.setText((millisUntilFinished) + "");
+                vCountDownSwitcher.setText((millisUntilFinished) + ":onTick");
                 Log.d("onTick", millisUntilFinished + "");
             }
 
@@ -99,7 +109,6 @@ public class CountTimerActivity extends AppCompatActivity {
     @OnClick(R.id.count_timer_start)
     public void count_start() {
         countTimer.start();
-        vCountStatus.setText("0:start");
     }
 
     @OnClick(R.id.count_timer_pause)
@@ -122,7 +131,6 @@ public class CountTimerActivity extends AppCompatActivity {
     @OnClick(R.id.countdown_timer_start)
     public void countdown_start() {
         countDownTimer.start();
-        vCountDownStatus.setText("start");
     }
 
     @OnClick(R.id.countdown_timer_pause)

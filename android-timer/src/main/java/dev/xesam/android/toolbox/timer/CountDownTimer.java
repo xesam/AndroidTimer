@@ -6,7 +6,7 @@ import android.os.SystemClock;
 
 /**
  * 倒计时器
- * <p/>
+ * <p>
  * xesamguo@gmail.com
  */
 public class CountDownTimer {
@@ -33,13 +33,6 @@ public class CountDownTimer {
     private boolean mCancelled = true;
     private boolean mRunning = false;
 
-    /**
-     * @param millisInFuture    The number of millis in the future from the call
-     *                          to {@link #start()} until the countdown is done and {@link #onFinish()}
-     *                          is called.
-     * @param countDownInterval The interval along the way to receive
-     *                          {@link #onTick(long)} callbacks.
-     */
     public CountDownTimer(long millisInFuture, long countDownInterval) {
         mMillisInFuture = millisInFuture;
         mCountdownInterval = countDownInterval;
@@ -56,6 +49,8 @@ public class CountDownTimer {
         mCancelled = false;
         mRunning = true;
         mTotalPausedFly = 0;
+        onStart(mMillisInFuture);
+
         mMillisStart = SystemClock.elapsedRealtime();
         mStopTimeInFuture = mMillisStart + mMillisInFuture;
         mHandler.sendMessage(mHandler.obtainMessage(MSG));
@@ -78,16 +73,12 @@ public class CountDownTimer {
             return;
         }
         mRunning = true;
+        onResume(mStopTimeInFuture - mMillisPause);
 
         long delay = mCountdownInterval - (mMillisPause - mMillisLastTickStart);
-        while (delay < 0) {
-            delay += mCountdownInterval;
-        }
-        final long tmpStopTimeInFuture = mStopTimeInFuture;
         mTotalPausedFly += SystemClock.elapsedRealtime() - mMillisPause;
         mStopTimeInFuture = mMillisStart + mMillisInFuture + mTotalPausedFly;
         mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), delay);
-        onResume(tmpStopTimeInFuture - mMillisPause);
     }
 
     /**
@@ -109,17 +100,15 @@ public class CountDownTimer {
         mMillisStart = NOT_START;
     }
 
+    public void onStart(long millisUntilFinished) {
+    }
+
     public void onPause(long millisUntilFinished) {
     }
 
     public void onResume(long millisUntilFinished) {
     }
 
-    /**
-     * Callback fired when the cancel.
-     *
-     * @param millisUntilFinished The amount of time until finished.
-     */
     public void onCancel(long millisUntilFinished) {
     }
 
@@ -143,14 +132,12 @@ public class CountDownTimer {
 
 
     // handles counting down
-    private Handler mHandler = new Handler() {
-
+    private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
-
+        public boolean handleMessage(Message msg) {
             synchronized (CountDownTimer.this) {
                 if (mCancelled || !mRunning) {
-                    return;
+                    return true;
                 }
 
                 final long millisLeft = mStopTimeInFuture - SystemClock.elapsedRealtime();
@@ -162,7 +149,7 @@ public class CountDownTimer {
                     onFinish();
                 } else if (millisLeft < mCountdownInterval) {
                     // no tick, just delay until done
-                    sendMessageDelayed(obtainMessage(MSG), millisLeft);
+                    mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), millisLeft);
                 } else {
                     mMillisLastTickStart = SystemClock.elapsedRealtime();
                     onTick(millisLeft);
@@ -176,10 +163,10 @@ public class CountDownTimer {
                         delay += mCountdownInterval;
                     }
 
-                    sendMessageDelayed(obtainMessage(MSG), delay);
+                    mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), delay);
                 }
             }
+            return true;
         }
-    };
-
+    });
 }
