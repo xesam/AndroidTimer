@@ -4,7 +4,6 @@
 
 源码地址：[Github AndroidTimer]( https://github.com/xesam/AndroidTimer)
 
-修改自 Android SDK 中的 [CountDownTimer](http://developer.android.com/reference/android/os/CountDownTimer.html)
 
 ## 特性
 
@@ -22,6 +21,7 @@
 
 ### CountTimer
 
+```java
     new CountTimer(100) {
 
         @Override
@@ -30,9 +30,11 @@
             Log.d("onTick", millisFly + "");
         }
     };
+```
 
 ### CountDownTimer
 
+```java
     new CountDownTimer(100) {
 
         @Override
@@ -56,7 +58,45 @@
         public void onFinish() {
         }
     };
+```
+
+## 使用一个 Handler 同时管理多个定时任务
+
+创建多个任务：
+
+```java
+    MultiCountTimer multiCountTimer = new MultiCountTimer(10);
+        multiCountTimer.registerTask(new CounterTimerTask(1) {
+            @Override
+            public void onTick(long millisFly) {
+                vMulti1.setText("multi_1:" + millisFly);
+            }
+        }).registerTask(new CounterTimerTask(2, 100) {
+            @Override
+            public void onTick(long millisFly) {
+                vMulti2.setText("multi_2:" + millisFly);
+            }
+        }).registerTask(new CounterTimerTask(3, 1000) {
+            @Override
+            public void onTick(long millisFly) {
+                vMulti3.setText("multi_3:" + millisFly);
+            }
+        });
+
+        multiCountTimer.startAll();
+```
+
+取消任务：
+
+```java
+    multiCountTimer.cancel(2);
+    或者
+    multiCountTimer.cancelAll();
+```
 
 ## 截图
 
 ![timer](./timer.png)
+
+
+参考自 Android SDK 中的 [CountDownTimer](http://developer.android.com/reference/android/os/CountDownTimer.html)
