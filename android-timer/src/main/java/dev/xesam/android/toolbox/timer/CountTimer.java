@@ -34,15 +34,14 @@ public class CountTimer {
     /**
      * Start the count.
      */
-    public synchronized CountTimer start() {
+    public synchronized void start() {
         mCancelled = false;
         mRunning = true;
         mTotalPausedFly = 0;
         onStart(0);
-        
+
         mMillisStart = SystemClock.elapsedRealtime();
         mHandler.sendMessage(mHandler.obtainMessage(MSG));
-        return this;
     }
 
     /**
