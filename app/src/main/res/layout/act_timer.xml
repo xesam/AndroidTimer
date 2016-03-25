@@ -60,7 +60,7 @@
         <TextSwitcher
             android:id="@+id/count_timer_ts"
             android:layout_width="match_parent"
-            android:layout_height="100dp">
+            android:layout_height="60dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -128,7 +128,67 @@
         <TextSwitcher
             android:id="@+id/countdown_timer_ts"
             android:layout_width="match_parent"
-            android:layout_height="100dp">
+            android:layout_height="60dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=""
+                android:textSize="40dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=""
+                android:textSize="40dp" />
+        </TextSwitcher>
+
+        <TextSwitcher
+            android:id="@+id/multi_1"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=""
+                android:textSize="40dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=""
+                android:textSize="40dp" />
+        </TextSwitcher>
+
+        <TextSwitcher
+            android:id="@+id/multi_2"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=""
+                android:textSize="40dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text=""
+                android:textSize="40dp" />
+        </TextSwitcher>
+
+        <TextSwitcher
+            android:id="@+id/multi_3"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
 
             <TextView
                 android:layout_width="match_parent"

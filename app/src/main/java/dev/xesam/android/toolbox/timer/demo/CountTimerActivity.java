@@ -13,6 +13,8 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import dev.xesam.android.toolbox.timer.CountDownTimer;
 import dev.xesam.android.toolbox.timer.CountTimer;
+import dev.xesam.android.toolbox.timer.CounterTimerTask;
+import dev.xesam.android.toolbox.timer.MultiCountTimer;
 
 /**
  * xesamguo@gmail.com
@@ -28,6 +30,13 @@ public class CountTimerActivity extends AppCompatActivity {
     public TextSwitcher vCountDownSwitcher;
     @InjectView(R.id.countdown_timer_status)
     public TextView vCountDownStatus;
+
+    @InjectView(R.id.multi_1)
+    public TextSwitcher vMulti1;
+    @InjectView(R.id.multi_2)
+    public TextSwitcher vMulti2;
+    @InjectView(R.id.multi_3)
+    public TextSwitcher vMulti3;
 
 
     private CountTimer countTimer;
@@ -104,6 +113,26 @@ public class CountTimerActivity extends AppCompatActivity {
                 vCountDownStatus.setText("onFinish");
             }
         };
+
+        MultiCountTimer multiCountTimer = new MultiCountTimer(10);
+        multiCountTimer.registerTask(new CounterTimerTask(1) {
+            @Override
+            public void onTick(long millisFly) {
+                vMulti1.setText("multi_1:" + millisFly);
+            }
+        }).registerTask(new CounterTimerTask(2, 100) {
+            @Override
+            public void onTick(long millisFly) {
+                vMulti2.setText("multi_2:" + millisFly);
+            }
+        }).registerTask(new CounterTimerTask(3, 1000) {
+            @Override
+            public void onTick(long millisFly) {
+                vMulti3.setText("multi_3:" + millisFly);
+            }
+        });
+
+        multiCountTimer.startAll();
     }
 
     @OnClick(R.id.count_timer_start)
