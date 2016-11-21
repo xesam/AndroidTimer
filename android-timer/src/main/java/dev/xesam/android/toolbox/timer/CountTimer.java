@@ -11,21 +11,16 @@ import android.os.SystemClock;
  */
 public class CountTimer {
 
-    private static final int NOT_START = -1;
-
     private final long mCountInterval;
-
-    private long mTotalPausedFly;
-
-    private long mMillisStart = NOT_START;
+    private long mMillisStart = -1;
     private long mMillisPause;
     private long mMillisLastTickStart;
+    private long mTotalPausedFly;
 
     /**
-     * boolean representing if the timer was cancelled
+     * representing the timer state
      */
-    private boolean mCancelled = true;
-    private boolean mRunning = false;
+    private int mState = State.TIMER_NOT_START;
 
     public CountTimer(long countInterval) {
         mCountInterval = countInterval;
@@ -35,11 +30,10 @@ public class CountTimer {
      * Start the timer.
      */
     public synchronized void start() {
-        mCancelled = false;
-        mRunning = true;
         mTotalPausedFly = 0;
         mMillisStart = SystemClock.elapsedRealtime();
         mHandler.sendEmptyMessage(MSG);
+        mState = State.TIMER_RUNNING;
         onStart(0);
     }
 
@@ -48,10 +42,10 @@ public class CountTimer {
      * if the timer has been canceled or is running --> skip
      */
     public synchronized void pause() {
-        if (mCancelled || !mRunning) {
+        if (mState != State.TIMER_RUNNING) {
             return;
         }
-        mRunning = false;
+        mState = State.TIMER_PAUSED;
 
         mHandler.removeMessages(MSG);
         mMillisPause = SystemClock.elapsedRealtime();
@@ -62,10 +56,10 @@ public class CountTimer {
      * Resume the timer.
      */
     public synchronized void resume() {
-        if (mCancelled || mRunning) {
+        if (mState != State.TIMER_PAUSED) {
             return;
         }
-        mRunning = true;
+        mState = State.TIMER_RUNNING;
 
         onResume(mMillisPause - mMillisStart - mTotalPausedFly);
 
@@ -78,19 +72,21 @@ public class CountTimer {
      * Cancel the timer.
      */
     public synchronized void cancel() {
-        if (mMillisStart == NOT_START) {
+        if (mState == State.TIMER_NOT_START) {
             return;
         }
-        mCancelled = true;
         mHandler.removeMessages(MSG);
 
-        if (mRunning) { //running -> cancel
+        if (mState == State.TIMER_RUNNING) { //running -> cancel
             onCancel(SystemClock.elapsedRealtime() - mMillisStart - mTotalPausedFly);
-        } else { //pause -> cancel
+        } else if (mState == State.TIMER_PAUSED) { //pause -> cancel
             onCancel(mMillisPause - mMillisStart - mTotalPausedFly);
         }
-        mRunning = false;
-        mMillisStart = NOT_START;
+        mState = State.TIMER_NOT_START;
+    }
+
+    public int getState() {
+        return mState;
     }
 
     /**
@@ -123,10 +119,6 @@ public class CountTimer {
     public void onTick(long millisFly) {
     }
 
-    public final boolean isRunning() {
-        return mRunning;
-    }
-
     // handles counting
     private Handler mHandler = new Handler() {
 
@@ -134,7 +126,7 @@ public class CountTimer {
         public void handleMessage(Message msg) {
 
             synchronized (CountTimer.this) {
-                if (mCancelled || !mRunning) {
+                if (mState != State.TIMER_RUNNING) {
                     return;
                 }
 
