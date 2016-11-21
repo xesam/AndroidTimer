@@ -32,20 +32,20 @@ public class CountTimer {
     }
 
     /**
-     * Start the count.
+     * Start the timer.
      */
     public synchronized void start() {
         mCancelled = false;
         mRunning = true;
         mTotalPausedFly = 0;
-        onStart(0);
-
         mMillisStart = SystemClock.elapsedRealtime();
-        mHandler.sendMessage(mHandler.obtainMessage(MSG));
+        mHandler.sendEmptyMessage(MSG);
+        onStart(0);
     }
 
     /**
-     * Pause the count.
+     * Pause the timer.
+     * if the timer has been canceled or is running --> skip
      */
     public synchronized void pause() {
         if (mCancelled || !mRunning) {
@@ -59,7 +59,7 @@ public class CountTimer {
     }
 
     /**
-     * Resume the count.
+     * Resume the timer.
      */
     public synchronized void resume() {
         if (mCancelled || mRunning) {
@@ -71,14 +71,13 @@ public class CountTimer {
 
         long delay = mCountInterval - (mMillisPause - mMillisLastTickStart);
         mTotalPausedFly += SystemClock.elapsedRealtime() - mMillisPause;
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), delay);
+        mHandler.sendEmptyMessageDelayed(MSG, delay);
     }
 
     /**
-     * Cancel the count.
+     * Cancel the timer.
      */
     public synchronized void cancel() {
-
         if (mMillisStart == NOT_START) {
             return;
         }
@@ -94,18 +93,33 @@ public class CountTimer {
         mMillisStart = NOT_START;
     }
 
+    /**
+     * @param millisFly The amount of time fly,not include paused time.
+     */
     public void onStart(long millisFly) {
     }
 
+    /**
+     * @param millisFly The amount of time fly,not include paused time.
+     */
     public void onCancel(long millisFly) {
     }
 
+    /**
+     * @param millisFly The amount of time fly,not include paused time.
+     */
     public void onPause(long millisFly) {
     }
 
+    /**
+     * @param millisFly The amount of time fly,not include paused time.
+     */
     public void onResume(long millisFly) {
     }
 
+    /**
+     * @param millisFly The amount of time fly,not include paused time.
+     */
     public void onTick(long millisFly) {
     }
 
