@@ -20,7 +20,7 @@ public class CountTimer {
     /**
      * representing the timer state
      */
-    private int mState = State.TIMER_NOT_START;
+    private volatile int mState = State.TIMER_NOT_START;
 
     public CountTimer(long interval) {
         mMillisInterval = interval;

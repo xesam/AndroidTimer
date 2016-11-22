@@ -17,7 +17,7 @@ public class CountDownTimer {
      */
     private final long mMillisInFuture;
 
-    private final long mCountdownInterval;
+    private final long mInterval;
 
     private long mStopTimeInFuture;
 
@@ -26,78 +26,77 @@ public class CountDownTimer {
     private long mMillisLastTickStart;
 
     private long mTotalPausedFly;
-
     /**
-     * boolean representing if the timer was cancelled
+     * representing the timer state
      */
-    private boolean mCancelled = true;
-    private boolean mRunning = false;
+    private volatile int mState = State.TIMER_NOT_START;
 
     public CountDownTimer(long millisInFuture, long countDownInterval) {
         mMillisInFuture = millisInFuture;
-        mCountdownInterval = countDownInterval;
+        mInterval = countDownInterval;
     }
 
     /**
      * Start the countdown.
      */
-    public synchronized CountDownTimer start() {
+    public synchronized void start() {
         if (mMillisInFuture <= 0) {
             onFinish();
-            return this;
+            return;
         }
-        mCancelled = false;
-        mRunning = true;
         mTotalPausedFly = 0;
-        onStart(mMillisInFuture);
-
         mMillisStart = SystemClock.elapsedRealtime();
+        mState = State.TIMER_RUNNING;
         mStopTimeInFuture = mMillisStart + mMillisInFuture;
-        mHandler.sendMessage(mHandler.obtainMessage(MSG));
-        return this;
+
+        onStart(mMillisInFuture);
+        mHandler.sendEmptyMessage(MSG);
     }
 
     public synchronized void pause() {
-        if (mCancelled || !mRunning) {
+        if (mState != State.TIMER_RUNNING) {
             return;
         }
-        mRunning = false;
+        mHandler.removeMessages(MSG);
+        mState = State.TIMER_PAUSED;
 
         mMillisPause = SystemClock.elapsedRealtime();
-        mHandler.removeMessages(MSG);
         onPause(mStopTimeInFuture - mMillisPause);
     }
 
     public synchronized void resume() {
-        if (mCancelled || mRunning) {
+        if (mState != State.TIMER_PAUSED) {
             return;
         }
-        mRunning = true;
+        mState = State.TIMER_RUNNING;
         onResume(mStopTimeInFuture - mMillisPause);
 
-        long delay = mCountdownInterval - (mMillisPause - mMillisLastTickStart);
+        long delay = mInterval - (mMillisPause - mMillisLastTickStart);
         mTotalPausedFly += SystemClock.elapsedRealtime() - mMillisPause;
         mStopTimeInFuture = mMillisStart + mMillisInFuture + mTotalPausedFly;
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), delay);
+        mHandler.sendEmptyMessageDelayed(MSG, delay);
     }
 
     /**
      * Cancel the countdown.
      */
     public synchronized void cancel() {
-        if (mMillisStart == NOT_START) {
+        if (mState == State.TIMER_NOT_START) {
             return;
         }
-        mCancelled = true;
+        final int preState = mState;
         mHandler.removeMessages(MSG);
+        mState = State.TIMER_NOT_START;
 
-        if (mRunning) { //running -> cancel
+        if (preState == State.TIMER_RUNNING) { //running -> cancel
             onCancel(mStopTimeInFuture - SystemClock.elapsedRealtime());
-        } else { //pause -> cancel
+        } else if (preState == State.TIMER_PAUSED) { //pause -> cancel
             onCancel(mStopTimeInFuture - mMillisPause);
         }
-        mRunning = false;
-        mMillisStart = NOT_START;
+    }
+
+    public int getState() {
+        return mState;
     }
 
     public void onStart(long millisUntilFinished) {
@@ -127,43 +126,41 @@ public class CountDownTimer {
     public void onFinish() {
     }
 
-
     private static final int MSG = 1;
 
-
-    // handles counting down
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             synchronized (CountDownTimer.this) {
-                if (mCancelled || !mRunning) {
+                if (mState != State.TIMER_RUNNING) {
                     return true;
                 }
 
                 final long millisLeft = mStopTimeInFuture - SystemClock.elapsedRealtime();
 
                 if (millisLeft <= 0) {
-                    mRunning = false;
-                    mCancelled = true;
                     onTick(0);
+                    mState = State.TIMER_NOT_START;
                     onFinish();
-                } else if (millisLeft < mCountdownInterval) {
+                } else if (millisLeft < mInterval) {
                     // no tick, just delay until done
-                    mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), millisLeft);
+                    mHandler.sendEmptyMessageDelayed(MSG, millisLeft);
                 } else {
                     mMillisLastTickStart = SystemClock.elapsedRealtime();
                     onTick(millisLeft);
-
+                    if (mState != State.TIMER_RUNNING) {
+                        return true;
+                    }
                     // take into account user's onTick taking time to execute
-                    long delay = mMillisLastTickStart + mCountdownInterval - SystemClock.elapsedRealtime();
+                    long delay = mMillisLastTickStart + mInterval - SystemClock.elapsedRealtime();
 
                     // special case: user's onTick took more than interval to
                     // complete, skip to next interval
                     while (delay < 0) {
-                        delay += mCountdownInterval;
+                        delay += mInterval;
                     }
 
-                    mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG), delay);
+                    mHandler.sendEmptyMessageDelayed(MSG, delay);
                 }
             }
             return true;

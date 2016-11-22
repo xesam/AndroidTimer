@@ -20,7 +20,7 @@ public class CounterTimerTask implements OnTickListener {
     private long mMillisLastTickStart;
 
     private Handler mHandler;
-    private int mState = State.TIMER_NOT_START;
+    private volatile int mState = State.TIMER_NOT_START;
 
     public CounterTimerTask(int id) {
         this(id, INVALID_INTERVAL);
