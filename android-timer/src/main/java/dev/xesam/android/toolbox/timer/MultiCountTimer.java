@@ -13,23 +13,19 @@ public class MultiCountTimer {
 
     private static final long DEFAULT_INTERVAL = 1000;
 
-    private SparseArray<CounterTimerTask> ticks = new SparseArray<>();
+    private SparseArray<CounterTimerTask> mTicks = new SparseArray<>();
     private long mDefaultInterval = DEFAULT_INTERVAL;
 
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
 
-            final int msgType = msg.what;
+            final int id = msg.what;
 
             synchronized (MultiCountTimer.this) {
 
-                CounterTimerTask task = ticks.get(msgType);
-                if (task == null) {
-                    return;
-                }
-
-                if (task.isCancelled() || !task.isRunning()) {
+                CounterTimerTask task = mTicks.get(id);
+                if (task == null || task.getState() != State.TIMER_RUNNING) {
                     return;
                 }
 
@@ -45,61 +41,61 @@ public class MultiCountTimer {
         mDefaultInterval = defaultInterval;
     }
 
-    public synchronized MultiCountTimer registerTask(CounterTimerTask task) {
+    public synchronized MultiCountTimer add(CounterTimerTask task) {
         task.attachHandler(mHandler);
         if (task.mCountInterval == CounterTimerTask.INVALID_INTERVAL) {
             task.mCountInterval = mDefaultInterval;
         }
-        ticks.append(task.getType(), task);
+        mTicks.append(task.mId, task);
         return this;
     }
 
     public synchronized void startAll() {
-        for (int i = 0, size = ticks.size(); i < size; i++) {
-            int key = ticks.keyAt(i);
-            ticks.get(key).start();
+        for (int i = 0, size = mTicks.size(); i < size; i++) {
+            int key = mTicks.keyAt(i);
+            mTicks.get(key).start();
         }
     }
 
     public synchronized void cancelAll() {
-        for (int i = 0, size = ticks.size(); i < size; i++) {
-            int key = ticks.keyAt(i);
-            ticks.get(key).cancel();
+        for (int i = 0, size = mTicks.size(); i < size; i++) {
+            int key = mTicks.keyAt(i);
+            mTicks.get(key).cancel();
         }
-        ticks.clear();
+        mTicks.clear();
     }
 
-    public synchronized void start(int type) {
-        CounterTimerTask task = ticks.get(type);
+    public synchronized void start(int id) {
+        CounterTimerTask task = mTicks.get(id);
         if (task == null) {
             return;
         }
         task.start();
     }
 
-    public synchronized void pause(int type) {
-        CounterTimerTask task = ticks.get(type);
+    public synchronized void pause(int id) {
+        CounterTimerTask task = mTicks.get(id);
         if (task == null) {
             return;
         }
         task.pause();
     }
 
-    public synchronized void resume(int type) {
-        CounterTimerTask task = ticks.get(type);
+    public synchronized void resume(int id) {
+        CounterTimerTask task = mTicks.get(id);
         if (task == null) {
             return;
         }
         task.resume();
     }
 
-    public synchronized void cancel(int type) {
-        CounterTimerTask task = ticks.get(type);
+    public synchronized void cancel(int id) {
+        CounterTimerTask task = mTicks.get(id);
         if (task == null) {
             return;
         }
         task.cancel();
-        ticks.remove(type);
+        mTicks.remove(id);
     }
 
 }

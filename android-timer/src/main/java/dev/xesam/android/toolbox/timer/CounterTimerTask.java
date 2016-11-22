@@ -11,42 +11,28 @@ public class CounterTimerTask implements OnTickListener {
     static final long INVALID_INTERVAL = -1;
     private static final int NOT_START = -1;
 
-    final int mType;
+    final int mId;
     long mCountInterval = INVALID_INTERVAL;
 
-    long mTotalPausedFly;
-    long mMillisStart = NOT_START;
-    long mMillisPause;
-    long mMillisLastTickStart;
-
-    private boolean mCancelled = true;
-    private boolean mRunning = false;
+    private long mTotalPausedFly;
+    private long mMillisStart = NOT_START;
+    private long mMillisPause;
+    private long mMillisLastTickStart;
 
     private Handler mHandler;
+    private int mState = State.TIMER_NOT_START;
 
-    public CounterTimerTask(int type) {
-        this(type, INVALID_INTERVAL);
+    public CounterTimerTask(int id) {
+        this(id, INVALID_INTERVAL);
     }
 
-    public CounterTimerTask(int type, long interval) {
-        mType = type;
+    public CounterTimerTask(int id, long interval) {
+        mId = id;
         mCountInterval = interval;
     }
 
     void attachHandler(Handler handler) {
         mHandler = handler;
-    }
-
-    int getType() {
-        return mType;
-    }
-
-    public boolean isCancelled() {
-        return mCancelled;
-    }
-
-    public boolean isRunning() {
-        return mRunning;
     }
 
     void tickAndNext() {
@@ -59,32 +45,30 @@ public class CounterTimerTask implements OnTickListener {
             delay += mCountInterval;
         }
 
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(mType), delay);
+        mHandler.sendMessageDelayed(mHandler.obtainMessage(mId), delay);
     }
 
     /**
      * Start the count.
      */
     public void start() {
-        mCancelled = false;
-        mRunning = true;
         mTotalPausedFly = 0;
-        onStart(0);
-
         mMillisStart = SystemClock.elapsedRealtime();
-        mHandler.sendMessage(mHandler.obtainMessage(mType));
+        mState = State.TIMER_RUNNING;
+        onStart(0);
+        mHandler.sendEmptyMessage(mId);
     }
 
     /**
      * Pause the count.
      */
     public void pause() {
-        if (mCancelled || !mRunning) {
+        if (mState != State.TIMER_RUNNING) {
             return;
         }
-        mRunning = false;
+        mHandler.removeMessages(mId);
+        mState = State.TIMER_PAUSED;
 
-        mHandler.removeMessages(mType);
         mMillisPause = SystemClock.elapsedRealtime();
         onPause(mMillisPause - mMillisStart - mTotalPausedFly);
     }
@@ -93,17 +77,16 @@ public class CounterTimerTask implements OnTickListener {
      * Resume the count.
      */
     public void resume() {
-        if (mCancelled || mRunning) {
+        if (mState != State.TIMER_PAUSED) {
             return;
         }
-        mRunning = true;
+        mState = State.TIMER_RUNNING;
 
         onResume(mMillisPause - mMillisStart - mTotalPausedFly);
 
         mTotalPausedFly += SystemClock.elapsedRealtime() - mMillisPause;
-
         long delay = mCountInterval - (mMillisPause - mMillisLastTickStart);
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(mType), delay);
+        mHandler.sendEmptyMessageDelayed(mId, delay);
     }
 
     /**
@@ -111,19 +94,22 @@ public class CounterTimerTask implements OnTickListener {
      */
     public void cancel() {
 
-        if (mMillisStart == NOT_START) {
+        if (mState == State.TIMER_NOT_START) {
             return;
         }
-        mCancelled = true;
-        mHandler.removeMessages(mType);
+        final int preState = mState;
+        mHandler.removeMessages(mId);
+        mState = State.TIMER_NOT_START;
 
-        if (mRunning) { //running -> cancel
+        if (preState == State.TIMER_RUNNING) { //running -> cancel
             onCancel(SystemClock.elapsedRealtime() - mMillisStart - mTotalPausedFly);
-        } else { //pause -> cancel
+        } else if (preState == State.TIMER_PAUSED) { //pause -> cancel
             onCancel(mMillisPause - mMillisStart - mTotalPausedFly);
         }
-        mRunning = false;
-        mMillisStart = NOT_START;
+    }
+
+    public int getState() {
+        return mState;
     }
 
     @Override

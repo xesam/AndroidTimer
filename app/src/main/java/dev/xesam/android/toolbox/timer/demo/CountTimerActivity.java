@@ -115,17 +115,17 @@ public class CountTimerActivity extends AppCompatActivity {
         };
 
         MultiCountTimer multiCountTimer = new MultiCountTimer(10);
-        multiCountTimer.registerTask(new CounterTimerTask(1) {
+        multiCountTimer.add(new CounterTimerTask(1) {
             @Override
             public void onTick(long millisFly) {
                 vMulti1.setText("multi_1:" + millisFly);
             }
-        }).registerTask(new CounterTimerTask(2, 100) {
+        }).add(new CounterTimerTask(2, 100) {
             @Override
             public void onTick(long millisFly) {
                 vMulti2.setText("multi_2:" + millisFly);
             }
-        }).registerTask(new CounterTimerTask(3, 1000) {
+        }).add(new CounterTimerTask(3, 1000) {
             @Override
             public void onTick(long millisFly) {
                 vMulti3.setText("multi_3:" + millisFly);

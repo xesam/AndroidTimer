@@ -49,9 +49,9 @@ public class CountTimer {
         if (mState != State.TIMER_RUNNING) {
             return;
         }
+        mHandler.removeMessages(MSG);
         mState = State.TIMER_PAUSED;
 
-        mHandler.removeMessages(MSG);
         mMillisPause = SystemClock.elapsedRealtime();
         onPause(mMillisPause - mMillisStart - mTotalPausedFly);
     }
