@@ -11,7 +11,7 @@ import android.os.SystemClock;
  */
 public class CountTimer {
 
-    private final long mCountInterval;
+    private long mMillisInterval;
     private long mMillisStart = -1;
     private long mMillisPause;
     private long mMillisLastTickStart;
@@ -22,8 +22,12 @@ public class CountTimer {
      */
     private int mState = State.TIMER_NOT_START;
 
-    public CountTimer(long countInterval) {
-        mCountInterval = countInterval;
+    public CountTimer(long interval) {
+        mMillisInterval = interval;
+    }
+
+    protected synchronized void setInterval(long interval) {
+        mMillisInterval = interval;
     }
 
     /**
@@ -32,9 +36,9 @@ public class CountTimer {
     public synchronized void start() {
         mTotalPausedFly = 0;
         mMillisStart = SystemClock.elapsedRealtime();
-        mHandler.sendEmptyMessage(MSG);
         mState = State.TIMER_RUNNING;
         onStart(0);
+        mHandler.sendEmptyMessage(MSG);
     }
 
     /**
@@ -63,7 +67,7 @@ public class CountTimer {
 
         onResume(mMillisPause - mMillisStart - mTotalPausedFly);
 
-        long delay = mCountInterval - (mMillisPause - mMillisLastTickStart);
+        long delay = mMillisInterval - (mMillisPause - mMillisLastTickStart);
         mTotalPausedFly += SystemClock.elapsedRealtime() - mMillisPause;
         mHandler.sendEmptyMessageDelayed(MSG, delay);
     }
@@ -75,14 +79,15 @@ public class CountTimer {
         if (mState == State.TIMER_NOT_START) {
             return;
         }
+        final int preState = mState;
         mHandler.removeMessages(MSG);
+        mState = State.TIMER_NOT_START;
 
-        if (mState == State.TIMER_RUNNING) { //running -> cancel
+        if (preState == State.TIMER_RUNNING) { //running -> cancel
             onCancel(SystemClock.elapsedRealtime() - mMillisStart - mTotalPausedFly);
-        } else if (mState == State.TIMER_PAUSED) { //pause -> cancel
+        } else if (preState == State.TIMER_PAUSED) { //pause -> cancel
             onCancel(mMillisPause - mMillisStart - mTotalPausedFly);
         }
-        mState = State.TIMER_NOT_START;
     }
 
     public int getState() {
@@ -137,12 +142,12 @@ public class CountTimer {
                 }
 
                 // take into account user's onTick taking time to execute
-                long delay = mMillisLastTickStart + mCountInterval - SystemClock.elapsedRealtime();
+                long delay = mMillisLastTickStart + mMillisInterval - SystemClock.elapsedRealtime();
 
                 // special case: user's onTick took more than interval to
                 // complete, skip to next interval
                 while (delay < 0) {
-                    delay += mCountInterval;
+                    delay += mMillisInterval;
                 }
 
                 sendMessageDelayed(obtainMessage(MSG), delay);
