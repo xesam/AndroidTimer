@@ -13,7 +13,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import dev.xesam.android.toolbox.timer.CountDownTimer;
 import dev.xesam.android.toolbox.timer.CountTimer;
-import dev.xesam.android.toolbox.timer.CounterTimerTask;
+import dev.xesam.android.toolbox.timer.CountTimerTask;
 import dev.xesam.android.toolbox.timer.MultiCountTimer;
 
 /**
@@ -115,17 +115,17 @@ public class CountTimerActivity extends AppCompatActivity {
         };
 
         MultiCountTimer multiCountTimer = new MultiCountTimer(10);
-        multiCountTimer.add(new CounterTimerTask(1) {
+        multiCountTimer.add(new CountTimerTask(1) {
             @Override
             public void onTick(long millisFly) {
                 vMulti1.setText("multi_1:" + millisFly);
             }
-        }).add(new CounterTimerTask(2, 100) {
+        }).add(new CountTimerTask(2, 100) {
             @Override
             public void onTick(long millisFly) {
                 vMulti2.setText("multi_2:" + millisFly);
             }
-        }).add(new CounterTimerTask(3, 1000) {
+        }).add(new CountTimerTask(3, 1000) {
             @Override
             public void onTick(long millisFly) {
                 vMulti3.setText("multi_3:" + millisFly);

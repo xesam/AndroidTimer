@@ -13,7 +13,7 @@ public class MultiCountTimer {
 
     private static final long DEFAULT_INTERVAL = 1000;
 
-    private SparseArray<CounterTimerTask> mTicks = new SparseArray<>();
+    private SparseArray<CountTimerTask> mTicks = new SparseArray<>();
     private long mDefaultInterval = DEFAULT_INTERVAL;
 
     private Handler mHandler = new Handler() {
@@ -24,7 +24,7 @@ public class MultiCountTimer {
 
             synchronized (MultiCountTimer.this) {
 
-                CounterTimerTask task = mTicks.get(id);
+                CountTimerTask task = mTicks.get(id);
                 if (task == null || task.getState() != State.TIMER_RUNNING) {
                     return;
                 }
@@ -41,9 +41,9 @@ public class MultiCountTimer {
         mDefaultInterval = defaultInterval;
     }
 
-    public synchronized MultiCountTimer add(CounterTimerTask task) {
+    public synchronized MultiCountTimer add(CountTimerTask task) {
         task.attachHandler(mHandler);
-        if (task.mCountInterval == CounterTimerTask.INVALID_INTERVAL) {
+        if (task.mCountInterval == CountTimerTask.INVALID_INTERVAL) {
             task.mCountInterval = mDefaultInterval;
         }
         mTicks.append(task.mId, task);
@@ -66,7 +66,7 @@ public class MultiCountTimer {
     }
 
     public synchronized void start(int id) {
-        CounterTimerTask task = mTicks.get(id);
+        CountTimerTask task = mTicks.get(id);
         if (task == null) {
             return;
         }
@@ -74,7 +74,7 @@ public class MultiCountTimer {
     }
 
     public synchronized void pause(int id) {
-        CounterTimerTask task = mTicks.get(id);
+        CountTimerTask task = mTicks.get(id);
         if (task == null) {
             return;
         }
@@ -82,7 +82,7 @@ public class MultiCountTimer {
     }
 
     public synchronized void resume(int id) {
-        CounterTimerTask task = mTicks.get(id);
+        CountTimerTask task = mTicks.get(id);
         if (task == null) {
             return;
         }
@@ -90,7 +90,7 @@ public class MultiCountTimer {
     }
 
     public synchronized void cancel(int id) {
-        CounterTimerTask task = mTicks.get(id);
+        CountTimerTask task = mTicks.get(id);
         if (task == null) {
             return;
         }
