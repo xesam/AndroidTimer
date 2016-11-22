@@ -35,7 +35,7 @@
 ### CountDownTimer
 
 ```java
-    new CountDownTimer(100) {
+    new CountDownTimer(10_000, 100) {
 
         @Override
         public void onTick(long millisUntilFinished) { // millisUntilFinished is the left time at *Running State*
@@ -65,8 +65,8 @@
 创建多个任务：
 
 ```java
-    MultiCountTimer multiCountTimer = new MultiCountTimer(10);
-        multiCountTimer.registerTask(new CounterTimerTask(1) {
+    MultiCountTimer multiCountTimer = new MultiCountTimer(100);
+        multiCountTimer.add(new CounterTimerTask(1) {
             @Override
             public void onTick(long millisFly) {
                 vMulti1.setText("multi_1:" + millisFly);
