@@ -132,6 +132,9 @@ public class CountTimer {
 
                 mMillisLastTickStart = SystemClock.elapsedRealtime();
                 onTick(mMillisLastTickStart - mMillisStart - mTotalPausedFly);
+                if (mState != State.TIMER_RUNNING) {
+                    return;
+                }
 
                 // take into account user's onTick taking time to execute
                 long delay = mMillisLastTickStart + mCountInterval - SystemClock.elapsedRealtime();
