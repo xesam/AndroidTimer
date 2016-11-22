@@ -97,31 +97,31 @@ public class CountTimer {
     /**
      * @param millisFly The amount of time fly,not include paused time.
      */
-    public void onStart(long millisFly) {
+    protected void onStart(long millisFly) {
     }
 
     /**
      * @param millisFly The amount of time fly,not include paused time.
      */
-    public void onCancel(long millisFly) {
+    protected void onCancel(long millisFly) {
     }
 
     /**
      * @param millisFly The amount of time fly,not include paused time.
      */
-    public void onPause(long millisFly) {
+    protected void onPause(long millisFly) {
     }
 
     /**
      * @param millisFly The amount of time fly,not include paused time.
      */
-    public void onResume(long millisFly) {
+    protected void onResume(long millisFly) {
     }
 
     /**
      * @param millisFly The amount of time fly,not include paused time.
      */
-    public void onTick(long millisFly) {
+    protected void onTick(long millisFly) {
     }
 
     // handles counting

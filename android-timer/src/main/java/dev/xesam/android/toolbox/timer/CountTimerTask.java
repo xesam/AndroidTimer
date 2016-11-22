@@ -6,7 +6,7 @@ import android.os.SystemClock;
 /**
  * Created by xesamguo@gmail.com on 16-3-25.
  */
-public class CountTimerTask implements OnTickListener {
+public class CountTimerTask {
 
     static final long INVALID_INTERVAL = -1;
     private static final int NOT_START = -1;
@@ -112,28 +112,23 @@ public class CountTimerTask implements OnTickListener {
         return mState;
     }
 
-    @Override
-    public void onStart(long millisFly) {
+    protected void onStart(long millisFly) {
 
     }
 
-    @Override
-    public void onCancel(long millisFly) {
+    protected void onCancel(long millisFly) {
 
     }
 
-    @Override
-    public void onPause(long millisFly) {
+    protected void onPause(long millisFly) {
 
     }
 
-    @Override
-    public void onResume(long millisFly) {
+    protected void onResume(long millisFly) {
 
     }
 
-    @Override
-    public void onTick(long millisFly) {
+    protected void onTick(long millisFly) {
 
     }
 }

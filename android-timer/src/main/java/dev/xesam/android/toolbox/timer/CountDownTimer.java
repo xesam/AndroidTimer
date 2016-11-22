@@ -99,16 +99,16 @@ public class CountDownTimer {
         return mState;
     }
 
-    public void onStart(long millisUntilFinished) {
+    protected void onStart(long millisUntilFinished) {
     }
 
-    public void onPause(long millisUntilFinished) {
+    protected void onPause(long millisUntilFinished) {
     }
 
-    public void onResume(long millisUntilFinished) {
+    protected void onResume(long millisUntilFinished) {
     }
 
-    public void onCancel(long millisUntilFinished) {
+    protected void onCancel(long millisUntilFinished) {
     }
 
     /**
@@ -116,9 +116,8 @@ public class CountDownTimer {
      *
      * @param millisUntilFinished The amount of time until finished.
      */
-    public void onTick(long millisUntilFinished) {
+    protected void onTick(long millisUntilFinished) {
     }
-
 
     /**
      * Callback fired when the time is up.
