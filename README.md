@@ -14,8 +14,8 @@
 1. resume
 1. cancel
 
-### 注意
-*以上方法是同步方法，请不要在回调方法里面调用以上方法。*
+## TODO
+- [ ] add ticker sequence
 
 ## 使用
 
