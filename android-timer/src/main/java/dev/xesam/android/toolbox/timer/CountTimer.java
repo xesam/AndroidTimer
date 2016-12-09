@@ -38,7 +38,7 @@ public class CountTimer {
         mMillisStart = SystemClock.elapsedRealtime();
         mState = State.TIMER_RUNNING;
         onStart(0);
-        mHandler.sendEmptyMessage(MSG);
+        mHandler.sendEmptyMessageDelayed(MSG, mMillisInterval);
     }
 
     /**
