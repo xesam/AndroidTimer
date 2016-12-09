@@ -14,6 +14,24 @@
 1. resume
 1. cancel
 
+## 使用
+
+```gradle
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+```gradle
+dependencies {
+    ...
+    compile 'com.github.xesam:AndroidTimer:v0.1'
+}
+```
+
 ## TODO
 - [ ] add ticker sequence
 
