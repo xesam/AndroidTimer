@@ -40,6 +40,9 @@ public class CountDownTimer {
      * Start the countdown.
      */
     public synchronized void start() {
+        if (mState == State.TIMER_RUNNING) {
+            return;
+        }
         if (mMillisInFuture <= 0) {
             onFinish();
             return;

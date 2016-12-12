@@ -34,6 +34,9 @@ public class CountTimer {
      * Start the timer.
      */
     public synchronized void start() {
+        if (mState == State.TIMER_RUNNING) {
+            return;
+        }
         mTotalPausedFly = 0;
         mMillisStart = SystemClock.elapsedRealtime();
         mState = State.TIMER_RUNNING;
