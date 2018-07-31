@@ -78,40 +78,6 @@ dependencies {
     };
 ```
 
-## 使用一个 Handler 同时管理多个定时任务
-
-创建多个任务：
-
-```java
-    MultiCountTimer multiCountTimer = new MultiCountTimer(100);
-        multiCountTimer.add(new CounterTimerTask(1) {
-            @Override
-            public void onTick(long millisFly) {
-                vMulti1.setText("multi_1:" + millisFly);
-            }
-        }).registerTask(new CounterTimerTask(2, 100) {
-            @Override
-            public void onTick(long millisFly) {
-                vMulti2.setText("multi_2:" + millisFly);
-            }
-        }).registerTask(new CounterTimerTask(3, 1000) {
-            @Override
-            public void onTick(long millisFly) {
-                vMulti3.setText("multi_3:" + millisFly);
-            }
-        });
-
-        multiCountTimer.startAll();
-```
-
-取消任务：
-
-```java
-    multiCountTimer.cancel(2);
-    或者
-    multiCountTimer.cancelAll();
-```
-
 ## 截图
 
 ![timer](./timer.png)
