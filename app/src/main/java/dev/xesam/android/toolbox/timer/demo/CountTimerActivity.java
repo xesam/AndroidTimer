@@ -8,8 +8,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 import dev.xesam.android.toolbox.timer.CountDownTimer;
 import dev.xesam.android.toolbox.timer.CountTimer;
@@ -21,21 +21,21 @@ import dev.xesam.android.toolbox.timer.MultiCountTimer;
  */
 public class CountTimerActivity extends AppCompatActivity {
 
-    @InjectView(R.id.count_timer_ts)
+    @BindView(R.id.count_timer_ts)
     public TextSwitcher vCountSwitcher;
-    @InjectView(R.id.count_timer_status)
+    @BindView(R.id.count_timer_status)
     public TextView vCountStatus;
 
-    @InjectView(R.id.countdown_timer_ts)
+    @BindView(R.id.countdown_timer_ts)
     public TextSwitcher vCountDownSwitcher;
-    @InjectView(R.id.countdown_timer_status)
+    @BindView(R.id.countdown_timer_status)
     public TextView vCountDownStatus;
 
-    @InjectView(R.id.multi_1)
+    @BindView(R.id.multi_1)
     public TextSwitcher vMulti1;
-    @InjectView(R.id.multi_2)
+    @BindView(R.id.multi_2)
     public TextSwitcher vMulti2;
-    @InjectView(R.id.multi_3)
+    @BindView(R.id.multi_3)
     public TextSwitcher vMulti3;
 
 
@@ -46,7 +46,7 @@ public class CountTimerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_timer);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         Animation in = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
         Animation out = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
