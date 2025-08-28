@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    `maven-publish`
 }
 
 android {
@@ -38,4 +39,15 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.7.0")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+}
+
+configure<PublishingExtension> {
+    publications {
+        create<MavenPublication>("release") {
+            // 设置基本信息
+            this.groupId = "com.github.xesam"
+            this.artifactId = "AndroidTimer"
+            this.version = "0.3.0"
+        }
+    }
 }
