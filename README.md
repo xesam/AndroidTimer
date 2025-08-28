@@ -1,4 +1,4 @@
-# Android Timer Library
+# AndroidTimer
 
 一个轻量级的Android计时器库，提供AndroidTimer和CountDownTimer两个核心组件，支持灵活的状态管理。
 
