@@ -46,7 +46,7 @@ publishing {
             version = '0.3.0'
             
             afterEvaluate {
-                from components.release
+                from components.findByName('release')
             }
         }
     }
