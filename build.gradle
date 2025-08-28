@@ -5,7 +5,13 @@ plugins {
 }
 
 ext {
-    set("minSdk", 21)
-    set("compileSdk", 36)
-    set("targetSdk", 36)
+    minSdk = 21
+    compileSdk = 36
+    targetSdk = 36
+}
+
+// 统一设置 group 和 version
+allprojects {
+    group = 'com.github.xesam'
+    version = '0.3.0'
 }

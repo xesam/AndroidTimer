@@ -2,9 +2,9 @@ pluginManagement {
     repositories {
         google {
             content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
+                includeGroupByRegex('com\\.android.*')
+                includeGroupByRegex('com\\.google.*')
+                includeGroupByRegex('androidx.*')
             }
         }
         mavenCentral()
@@ -16,9 +16,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // 添加 JitPack 仓库支持
+        maven { url 'https://jitpack.io' }
     }
 }
 
-rootProject.name = "AndroidTimer"
-include(":app")
-include(":android-timer")
+rootProject.name = 'AndroidTimer'
+include ':app'
+include ':android-timer'
