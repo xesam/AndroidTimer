@@ -67,25 +67,17 @@ AndroidTimer timer = new AndroidTimer(1000L) {
             }
         };
 
-// 启动计时器
-timer.
+// 启动
+timer.start();
 
-start();
+// 暂停
+timer.pause();
 
-// 暂停计时器
-timer.
+// 恢复
+timer.resume();
 
-pause();
-
-// 恢复计时器
-timer.
-
-resume();
-
-// 取消计时器
-timer.
-
-cancel();
+// 取消
+timer.cancel();
 ```
 
 #### CountDownTimer（倒计时器）
@@ -129,11 +121,17 @@ CountDownTimer countDownTimer = new CountDownTimer(10000L, 100L) {
                 Log.d("CountDown", "Finished!");
             }
         };
+// 启动
+countDownTimer.start();
 
-// 启动倒计时
-countDownTimer.
+// 暂停
+countDownTimer.pause();
 
-start();
+// 恢复
+countDownTimer.resume();
+
+// 取消
+countDownTimer.cancel();
 ```
 
 ## 📋 API 文档
