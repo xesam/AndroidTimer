@@ -20,6 +20,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -44,9 +49,8 @@ publishing {
             groupId = 'com.github.xesam'
             artifactId = 'AndroidTimer'
             version = '0.3.0'
-            
             afterEvaluate {
-                from components.findByName('release')
+                from components.release
             }
         }
     }
