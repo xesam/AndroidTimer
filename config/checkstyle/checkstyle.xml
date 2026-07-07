@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="warning"/>
+
+    <!-- 单行最长 160 字符 -->
+    <module name="LineLength">
+        <property name="max" value="160"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
+
+    <!-- 文件长度上限 -->
+    <module name="FileLength">
+        <property name="max" value="2000"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
+
+    <!-- 禁止 Tab 缩进 -->
+    <module name="FileTabCharacter">
+        <property name="fileExtensions" value="java"/>
+    </module>
+
+    <module name="TreeWalker">
+        <!-- 方法长度上限 -->
+        <module name="MethodLength">
+            <property name="max" value="200"/>
+        </module>
+        <!-- 参数数量上限 -->
+        <module name="ParameterNumber">
+            <property name="max" value="10"/>
+        </module>
+    </module>
+</module>

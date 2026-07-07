@@ -1,11 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AndroidTimer2</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">AndroidTimer</string>
 
-    <string name="menu_home">Home</string>
+    <!-- Header -->
+    <string name="header_title">AndroidTimer Demo</string>
+    <string name="header_subtitle">轻量计时器库 · 暂停/恢复 · Kotlin Flow · 防抖 Tick</string>
+
+    <!-- 语言区标题 -->
+    <string name="java_section_title">JAVA API</string>
+    <string name="java_section_subtitle">继承回调式 · 适用于 Java / 混合项目</string>
+    <string name="kt_section_title">KOTLIN API</string>
+    <string name="kt_section_subtitle">DSL + Flow · 响应式订阅状态与 tick</string>
+
+    <!-- 组件说明 -->
+    <string name="android_timer_desc">每 1000ms 触发 onTick，支持暂停 / 恢复，基于绝对时间防漂移</string>
+    <string name="count_down_timer_desc">5s 倒计时，每 1000ms 更新，支持暂停 / 恢复与 onFinish</string>
+    <string name="android_tick_desc">单次延迟回调，可用于防抖；tick(true) 取消上次并重计</string>
+    <string name="kt_android_timer_desc">同 Java 版本，额外提供 stateFlow / tickFlow 响应式订阅</string>
+    <string name="kt_count_down_timer_desc">同 Java 版本，额外提供 stateFlow / tickFlow / finishFlow</string>
+    <string name="kt_android_tick_desc">同 Java 版本，DSL 构建函数式调用</string>
+
+    <!-- 特性标签 -->
+    <string name="chip_periodic">周期计时</string>
+    <string name="chip_countdown">倒计时</string>
+    <string name="chip_single">单次延迟</string>
+    <string name="chip_debounce">防抖</string>
+    <string name="chip_pause_resume">暂停/恢复</string>
+    <string name="chip_absolute">绝对时间防漂移</string>
+    <string name="chip_on_finish">onFinish</string>
+    <string name="chip_force">force 重计</string>
+    <string name="chip_flow">Flow</string>
+    <string name="chip_dsl">DSL</string>
+    <string name="chip_finish_flow">finishFlow 演示</string>
+
+    <!-- 状态 -->
+    <string name="state_idle">IDLE</string>
+    <string name="state_running">RUNNING</string>
+    <string name="state_paused">PAUSED</string>
+
+    <!-- 按钮 -->
+    <string name="btn_start">start</string>
+    <string name="btn_pause">pause</string>
+    <string name="btn_resume">resume</string>
+    <string name="btn_cancel">cancel</string>
+    <string name="btn_tick">tick</string>
+    <string name="btn_force_tick">force tick</string>
 </resources>

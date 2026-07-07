@@ -1,18 +1,24 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    config = files("${rootProject.projectDir}/config/detekt/detekt.yml")
 }
 
 android {
-    namespace 'com.github.xesam.android.timer'
+    namespace 'com.github.xesam.android.timer.demo'
     compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
-        applicationId 'com.github.xesam.android.timer'
+        applicationId 'com.github.xesam.android.timer.demo'
         minSdk rootProject.ext.minSdk
         targetSdk rootProject.ext.targetSdk
         versionCode 1
-        versionName '0.1.0'
-
+        versionName rootProject.version.toString()
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
@@ -22,10 +28,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
     buildFeatures {
         viewBinding true
     }
@@ -34,12 +46,9 @@ android {
 dependencies {
     implementation libs.appcompat
     implementation libs.material
-    implementation libs.constraintlayout
-    implementation libs.lifecycle.livedata.ktx
-    implementation libs.lifecycle.viewmodel.ktx
-    implementation libs.navigation.fragment
-    implementation libs.navigation.ui
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation project(':android-timer')
+    implementation project(':android-timer-kt')
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

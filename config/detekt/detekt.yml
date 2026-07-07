@@ -1,0 +1,17 @@
+# detekt 配置：在默认规则集之上覆盖少量项
+# 详见 https://detekt.dev/docs/introduction/configurations
+
+style:
+  MaxLineLength:
+    maxLineLength: 160
+  # 测试中常出现魔法数字，关闭以减少噪音
+  MagicNumber:
+    active: false
+
+complexity:
+  # 演示与测试代码允许略高的复杂度
+  LongMethod:
+    threshold: 80
+  LongParameterList:
+    functionThreshold: 8
+    constructorThreshold: 10

@@ -388,13 +388,6 @@ public class AndroidTimerTest {
     }
 
     @Test
-    public void testZeroInterval_shouldWorkCorrectly() {
-        // 测试间隔为0的情况 - 实际上应该避免使用0间隔
-        // 因为0间隔会导致无限循环，这个测试被移除
-        // 如果需要测试边界情况，应该使用最小有效间隔
-    }
-
-    @Test
     public void testVerySmallInterval_shouldWorkCorrectly() {
         // 测试非常小的间隔而不是0间隔
         TestAndroidTimer timer = new TestAndroidTimer(1L); // 使用1ms作为最小有效间隔
@@ -402,10 +395,10 @@ public class AndroidTimerTest {
         
         // 快进一些时间
         ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
-        
-        // 验证timer正常工作
-        assertTrue(timer.getOnTickCount() >= 1);
-        
+
+        // 验证timer正常工作（PAUSED 模式下单次推进恰好触发 1 次 tick）
+        assertEquals(1, timer.getOnTickCount());
+
         timer.cancel();
     }
 

@@ -7,4 +7,35 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Java 主题色（Indigo 系） -->
+    <color name="java_primary">#FF3F51B5</color>
+    <color name="java_primary_dark">#FF303F9F</color>
+    <color name="java_section_bg">#FFE8EAF6</color>
+    <color name="java_chip_bg">#FFD1D9FF</color>
+    <color name="java_chip_text">#FF3F51B5</color>
+
+    <!-- Kotlin 主题色（Deep Orange 系） -->
+    <color name="kt_primary">#FFE64A19</color>
+    <color name="kt_primary_dark">#FFD84315</color>
+    <color name="kt_section_bg">#FFFBE9E7</color>
+    <color name="kt_chip_bg">#FFFFCCBC</color>
+    <color name="kt_chip_text">#FFE64A19</color>
+
+    <!-- 状态色 -->
+    <color name="state_idle">#FF9E9E9E</color>
+    <color name="state_running">#FF4CAF50</color>
+    <color name="state_paused">#FFFF9800</color>
+
+    <!-- 操作色 -->
+    <color name="danger">#FFE53935</color>
+
+    <!-- 卡片与面板 -->
+    <color name="card_bg">#FFFFFFFF</color>
+    <color name="card_stroke">#FFE0E0E0</color>
+    <color name="status_panel_bg">#FF263238</color>
+    <color name="status_panel_text">#FFECEFF1</color>
+
+    <!-- Header -->
+    <color name="header_bg">#FF3F51B5</color>
 </resources>

@@ -37,27 +37,48 @@ public class CountDownTimer {
     private final Handler mHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
+            long tickSnapshot = 0;
+            boolean fireNormalTick = false;
+            boolean fireFinish = false;
             synchronized (CountDownTimer.this) {
                 if (mStatus != TimerStatus.RUNNING) {
                     return true;
                 }
                 final long millisLeft = mFinishTimeInFuture - SystemClock.elapsedRealtime();
                 if (millisLeft <= 0) {
-                    onTick(0);
-                    triggerFinish();
-                    return true;
-                }
-                onTick(millisLeft);
-                if (mStatus != TimerStatus.RUNNING) {
-                    return true;
-                }
-                if (millisLeft < mMillisInterval) {
-                    mHandler.sendEmptyMessageDelayed(MSG, millisLeft);
+                    // 结束路径：仅由 tickWhenFinish 决定是否触发最终 onTick(0)
+                    mStatus = TimerStatus.IDLE;
+                    mHandler.removeMessages(MSG);
+                    fireFinish = true;
                 } else {
-                    // 更新下一次tick的绝对时间
-                    mNextTickTime += mMillisInterval;
-                    scheduleNextTick();
+                    tickSnapshot = millisLeft;
+                    fireNormalTick = true;
                 }
+            }
+
+            // 回调在锁外派发，避免用户回调重入时引发状态惊奇
+            if (fireNormalTick) {
+                onTick(tickSnapshot);
+                // onTick 后重新获取锁，决定下一次调度（可能直接结束）
+                synchronized (CountDownTimer.this) {
+                    if (mStatus == TimerStatus.RUNNING) {
+                        long millisLeft = mFinishTimeInFuture - SystemClock.elapsedRealtime();
+                        if (millisLeft < mMillisInterval) {
+                            mHandler.sendEmptyMessageDelayed(MSG, millisLeft);
+                        } else {
+                            mNextTickTime += mMillisInterval;
+                            if (scheduleNextTick()) {
+                                fireFinish = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (fireFinish) {
+                if (mOption.tickWhenFinish) {
+                    onTick(0);
+                }
+                onFinish(0);
             }
             return true;
         }
@@ -80,9 +101,10 @@ public class CountDownTimer {
     }
 
     /**
-     * 基于绝对时间调度下一次tick
+     * 增量调度下一次 tick；检测到倒计时结束时将状态置为 IDLE 并移除消息，
+     * 返回 true 表示结束已发生（调用方负责在锁外触发 onTick(0)/onFinish）。
      */
-    private void scheduleNextTick() {
+    private boolean scheduleNextTick() {
         long now = SystemClock.elapsedRealtime();
         long delay = mNextTickTime - now;
 
@@ -92,19 +114,12 @@ public class CountDownTimer {
             delay = mNextTickTime - now;
         }
         if (mNextTickTime > mFinishTimeInFuture) {
-            this.triggerFinish();
-        } else {
-            mHandler.sendEmptyMessageDelayed(MSG, delay);
+            mStatus = TimerStatus.IDLE;
+            mHandler.removeMessages(MSG);
+            return true;
         }
-    }
-
-    private void triggerFinish() {
-        mStatus = TimerStatus.IDLE;
-        mHandler.removeMessages(MSG);
-        if (mOption.tickWhenFinish) {
-            onTick(0);
-        }
-        onFinish(0);
+        mHandler.sendEmptyMessageDelayed(MSG, delay);
+        return false;
     }
 
     public final long getFutureDuration() {
@@ -119,65 +134,111 @@ public class CountDownTimer {
         return mStatus;
     }
 
-    public final synchronized void start() {
-        if (mStatus == TimerStatus.RUNNING) {
-            return;
-        }
-        if (mMillisFutureDuration <= 0) {
-            this.triggerFinish();
-            return;
-        }
-        mPausedTotal = 0;
-        mMillisStarted = SystemClock.elapsedRealtime();
-        mFinishTimeInFuture = mMillisStarted + mMillisFutureDuration;
-        mNextTickTime = mMillisStarted + mMillisInterval; // 设置第一次tick的绝对时间
+    public final void start() {
+        boolean fireStart = false;
+        long startArg = 0;
+        boolean fireTickStart = false;
+        long tickStartArg = 0;
+        boolean fireFinish = false;
+        synchronized (this) {
+            if (mStatus == TimerStatus.RUNNING) {
+                return;
+            }
+            if (mMillisFutureDuration <= 0) {
+                mStatus = TimerStatus.IDLE;
+                mHandler.removeMessages(MSG);
+                fireFinish = true;
+            } else {
+                mPausedTotal = 0;
+                mMillisStarted = SystemClock.elapsedRealtime();
+                mFinishTimeInFuture = mMillisStarted + mMillisFutureDuration;
+                mNextTickTime = mMillisStarted + mMillisInterval; // 设置第一次tick的绝对时间
 
-        mStatus = TimerStatus.RUNNING;
-        onStart(mMillisFutureDuration);
-        if (mOption.tickWhenStart) {
-            onTick(mMillisFutureDuration);
+                mStatus = TimerStatus.RUNNING;
+                fireStart = true;
+                startArg = mMillisFutureDuration;
+                if (mOption.tickWhenStart) {
+                    fireTickStart = true;
+                    tickStartArg = mMillisFutureDuration;
+                }
+                if (scheduleNextTick()) {
+                    fireFinish = true;
+                }
+            }
         }
-        scheduleNextTick();
+        if (fireStart) {
+            onStart(startArg);
+        }
+        if (fireTickStart) {
+            onTick(tickStartArg);
+        }
+        if (fireFinish) {
+            if (mOption.tickWhenFinish) {
+                onTick(0);
+            }
+            onFinish(0);
+        }
     }
 
-    public final synchronized void pause() {
-        if (mStatus != TimerStatus.RUNNING) {
-            return;
-        }
-        mHandler.removeMessages(MSG);
-        mStatus = TimerStatus.PAUSED;
+    public final void pause() {
+        long pauseArg;
+        synchronized (this) {
+            if (mStatus != TimerStatus.RUNNING) {
+                return;
+            }
+            mHandler.removeMessages(MSG);
+            mStatus = TimerStatus.PAUSED;
 
-        mMillisPaused = SystemClock.elapsedRealtime();
-        onPause(mFinishTimeInFuture - mMillisPaused);
+            mMillisPaused = SystemClock.elapsedRealtime();
+            pauseArg = mFinishTimeInFuture - mMillisPaused;
+        }
+        onPause(pauseArg);
     }
 
-    public final synchronized void resume() {
-        if (mStatus != TimerStatus.PAUSED) {
-            return;
-        }
-        mStatus = TimerStatus.RUNNING;
-        onResume(mFinishTimeInFuture - mMillisPaused);
+    public final void resume() {
+        long resumeArg;
+        boolean fireFinish = false;
+        synchronized (this) {
+            if (mStatus != TimerStatus.PAUSED) {
+                return;
+            }
+            mStatus = TimerStatus.RUNNING;
+            resumeArg = mFinishTimeInFuture - mMillisPaused;
 
-        long pauseDuration = SystemClock.elapsedRealtime() - mMillisPaused;
-        mPausedTotal += pauseDuration;
-        mFinishTimeInFuture = mMillisStarted + mMillisFutureDuration + mPausedTotal;
-        mNextTickTime += pauseDuration; // 调整下一次tick时间
-        scheduleNextTick();
+            long pauseDuration = SystemClock.elapsedRealtime() - mMillisPaused;
+            mPausedTotal += pauseDuration;
+            mFinishTimeInFuture = mMillisStarted + mMillisFutureDuration + mPausedTotal;
+            mNextTickTime += pauseDuration; // 调整下一次tick时间
+            if (scheduleNextTick()) {
+                fireFinish = true;
+            }
+        }
+        onResume(resumeArg);
+        if (fireFinish) {
+            if (mOption.tickWhenFinish) {
+                onTick(0);
+            }
+            onFinish(0);
+        }
     }
 
-    public final synchronized void cancel() {
-        if (mStatus == TimerStatus.IDLE) {
-            return;
-        }
-        final int preState = mStatus;
-        mHandler.removeMessages(MSG);
-        mStatus = TimerStatus.IDLE;
+    public final void cancel() {
+        long cancelArg;
+        synchronized (this) {
+            if (mStatus == TimerStatus.IDLE) {
+                return;
+            }
+            final int preState = mStatus;
+            mHandler.removeMessages(MSG);
+            mStatus = TimerStatus.IDLE;
 
-        if (preState == TimerStatus.RUNNING) { //running -> cancel
-            onCancel(mFinishTimeInFuture - SystemClock.elapsedRealtime());
-        } else if (preState == TimerStatus.PAUSED) { //pause -> cancel
-            onCancel(mFinishTimeInFuture - mMillisPaused);
+            if (preState == TimerStatus.RUNNING) { //running -> cancel
+                cancelArg = mFinishTimeInFuture - SystemClock.elapsedRealtime();
+            } else { //pause -> cancel
+                cancelArg = mFinishTimeInFuture - mMillisPaused;
+            }
         }
+        onCancel(cancelArg);
     }
 
     protected void onStart(long millisUntilFinished) {
@@ -195,6 +256,10 @@ public class CountDownTimer {
     protected void onTick(long millisUntilFinished) {
     }
 
-    protected void onFinish(long millisUntilFinished) {
+    /**
+     * 倒计时自然结束时调用。通过 cancel() 中止的倒计时不会触发此方法。
+     * @param millisDuration 始终为 0，表示倒计时已结束
+     */
+    protected void onFinish(long millisDuration) {
     }
 }

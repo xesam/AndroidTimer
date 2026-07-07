@@ -2,6 +2,8 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.vanniktech.maven.publish) apply false
 }
 
 ext {
@@ -12,6 +14,6 @@ ext {
 
 // 统一设置 group 和 version
 allprojects {
-    group = 'com.github.xesam'
-    version = '0.3.0'
+    group = 'io.github.xesam'
+    version = '0.4.0'
 }

@@ -16,11 +16,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // 添加 JitPack 仓库支持
-        maven { url 'https://jitpack.io' }
     }
 }
 
 rootProject.name = 'AndroidTimer'
 include ':app'
 include ':android-timer'
+include ':android-timer-kt'

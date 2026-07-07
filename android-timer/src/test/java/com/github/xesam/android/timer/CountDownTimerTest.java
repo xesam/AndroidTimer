@@ -163,16 +163,17 @@ public class CountDownTimerTest {
     public void testOnTick_shouldBeCalledAtRegularIntervals() {
         TestCountDownTimer timer = new TestCountDownTimer(10L, 1L);
         timer.start();
-        
+
         ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
-        assertTrue(timer.getOnTickCount() >= 1);
+        // PAUSED 模式下单次推进恰好触发 1 次 tick
+        assertEquals(1, timer.getOnTickCount());
     }
 
     @Test
     public void testOnFinish_shouldBeCalledWhenCountdownCompletes() {
         TestCountDownTimer timer = new TestCountDownTimer(10L, 1L);
         timer.start();
-        
+
         // 确保倒计时完成
         for (int i = 0; i < 15; i++) {
             ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
@@ -180,9 +181,43 @@ public class CountDownTimerTest {
                 break;
             }
         }
-        
+
         assertTrue(timer.getOnFinishCount() >= 1);
         assertEquals(TimerStatus.IDLE, timer.getState());
+    }
+
+    // tickWhenFinish=false：结束后不应触发 onTick(0)
+    @Test
+    public void testFinish_tickWhenFinishFalse_triggersNoFinalOnTick() {
+        TestCountDownTimer timer = new TestCountDownTimer(
+                10L, 1L, new CountDownTimer.Option(false, false));
+        timer.start();
+        for (int i = 0; i < 15; i++) {
+            ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
+            if (timer.getOnFinishCount() > 0) {
+                break;
+            }
+        }
+        assertTrue(timer.getOnFinishCount() >= 1);
+        assertEquals(0, timer.getZeroTickCount()); // 无 onTick(0)
+        assertTrue(timer.getLastMillisUntilFinished() > 0); // 最后一次正常 tick 仍有剩余
+    }
+
+    // tickWhenFinish=true：结束后应仅触发一次 onTick(0)
+    @Test
+    public void testFinish_tickWhenFinishTrue_triggersSingleFinalOnTick() {
+        TestCountDownTimer timer = new TestCountDownTimer(
+                10L, 1L, new CountDownTimer.Option(false, true));
+        timer.start();
+        for (int i = 0; i < 15; i++) {
+            ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
+            if (timer.getOnFinishCount() > 0) {
+                break;
+            }
+        }
+        assertTrue(timer.getOnFinishCount() >= 1);
+        assertEquals(1, timer.getZeroTickCount()); // 仅一次 onTick(0)
+        assertEquals(0L, timer.getLastMillisUntilFinished());
     }
 
     @Test
@@ -233,11 +268,16 @@ public class CountDownTimerTest {
         private int onResumeCount = 0;
         private int onCancelCount = 0;
         private int onFinishCount = 0;
+        private int zeroTickCount = 0; // onTick(0) 被触发的次数
         private long lastMillisUntilFinished = 0;
         private long lastMillisDuration = 0;
 
         public TestCountDownTimer(long millisDuration, long countDownInterval) {
             super(millisDuration, countDownInterval);
+        }
+
+        public TestCountDownTimer(long millisDuration, long countDownInterval, Option option) {
+            super(millisDuration, countDownInterval, option);
         }
 
         @Override
@@ -252,6 +292,9 @@ public class CountDownTimerTest {
             super.onTick(millisUntilFinished);
             onTickCount++;
             lastMillisUntilFinished = millisUntilFinished;
+            if (millisUntilFinished == 0) {
+                zeroTickCount++;
+            }
         }
 
         @Override
@@ -288,6 +331,7 @@ public class CountDownTimerTest {
         public int getOnResumeCount() { return onResumeCount; }
         public int getOnCancelCount() { return onCancelCount; }
         public int getOnFinishCount() { return onFinishCount; }
+        public int getZeroTickCount() { return zeroTickCount; }
         public long getLastMillisUntilFinished() { return lastMillisUntilFinished; }
     }
 }
